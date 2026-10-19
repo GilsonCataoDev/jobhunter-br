@@ -1,0 +1,66 @@
+# Configuração da Fase 1 (coleta + filtro + resumo). Nada aqui envia candidatura.
+gupy:
+  max_paginas_por_termo: 3          # 12 vagas por página
+  pausa_segundos: 1.5               # espera entre requisições
+  dias_maximos: 30                  # ignora vagas mais antigas
+  termos:
+    - suporte
+    - analista de suporte
+    - service desk
+    - help desk
+    - qa
+    - estágio ti
+    - desenvolvedor júnior
+    - front-end
+    - assistente administrativo
+    - analista administrativo
+    - atendimento
+    - assistente
+
+# Fontes extras (só leitura; o robô NÃO se candidata nelas: você recebe o link). Só entram vagas remotas.
+infojobs:
+  ativo: true
+  max_paginas_por_termo: 1          # 20 vagas por página, mais recentes primeiro (filtro "home office" do site)
+  termos: [suporte, analista de suporte, help desk, service desk, qa, estágio ti, assistente administrativo, atendimento]
+vagaja:
+  ativo: true
+  max_paginas: 60                   # o site é pequeno: filtra o sitemap pelo título antes de abrir as vagas
+
+# Prioridade (menor = melhor). A primeira palavra encontrada no TÍTULO define a faixa.
+faixas:
+  1: [suporte, "service desk", "help desk", "qa", "teste", "estágio", "estagiário", "desenvolvedor", "front", "tecnologia", "ti"]
+  2: [administrativ, "assistente de atendimento", "auxiliar", "analista de implantação", "assistente implantação", "cadastro", "back office"]
+  3: [atendimento]
+
+# Descarta se o TÍTULO tiver.
+titulo_proibido:
+  - sênior
+  - senior
+  - sr
+  - pleno
+  - pl
+  - líder
+  - lead
+  - coordenador
+  - gerente
+  - especialista
+  - supervisor
+  - contas a pagar
+  - fiscal
+  - contábil
+  - contabil
+  - jurídic
+  - juridic
+  - pcd
+  - "vaga exclusiva"
+  - bilíngue
+  - bilingue
+
+salario_minimo_efetivo: 2000        # só se a vaga informar o salário
+
+# Fase 3 – executor
+executor:
+  limite_diario: 10          # envios reais por dia (UTC)
+  pausa_min_s: 25            # pausa humana entre vagas
+  pausa_max_s: 70
+  falhas_seguidas_max: 2     # para o lote após N falhas seguidas (needs_human/error)

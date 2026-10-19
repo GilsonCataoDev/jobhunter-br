@@ -1,0 +1,50 @@
+# MODELO. Copie para answers.yml (que fica fora do git) e ajuste ao SEU perfil antes de rodar de verdade.
+# Valores abaixo são fictícios. Só entra aqui o que você realmente quer responder automaticamente.
+# Banco de respostas. Só entra aqui o que você já respondeu/autorizou. O resto vira PENDÊNCIA.
+# 'match' são regex (sem acento, minúsculas). A primeira regra que casa vence.
+
+perfil:
+  pretensao: {estagio: 1600, junior: 3000, farmaceutico: 4000}   # usado em campos numéricos e para escolher faixa
+  ultimo_salario: 2500
+  estado: Pernambuco
+  cidade: Recife
+  pais: Brasil
+  linkedin: https://www.linkedin.com/in/seu-usuario
+
+# NUNCA preenche sozinho (documento, dado de família, dado sensível): sempre pergunta.
+sensivel:
+  - '\brg\b|identidade|\bcpf\b|\bpis\b|\bcnh\b|titulo de eleitor|passaporte'
+  - 'nome completo d[aoe]s? (mae|pai)|filiacao|nome da mae|nome do pai'
+  - 'data de nascimento|nascimento|estado civil|naturalidade|nacionalidade'
+  - '\bendereco\b|\bcep\b|\blogradouro\b|telefone fixo'
+  - '\braca\b|\bcor\b|\betnia\b|\bgenero\b|orientacao sexual|\bdeficiencia\b|\bpcd\b|neurodiverg'
+  - 'conta bancaria|agencia bancaria|\bcartao\b'
+
+regras:
+  - {id: indicado,        match: 'alguem.*(indicou|indicacao)|foi indicad', responder: "Não"}
+  - {id: familiar,        match: '\bfamiliares?\b|\bparentes?\b|conjuge|vinculo afetivo|relacionamento afetivo', responder: "Não"}
+  - {id: conhece_alguem,  match: 'conhece alguem|conhece algum', responder: "Não"}
+  - {id: ja_trabalhou,    match: 'ja (trabalhou|foi colaborador|atuou) (conosco|aqui|na empresa|n[ao] {empresa}|pel[ao] {empresa})|ex-colaborador|ex-funcionario', responder: "Não"}
+  - {id: trabalha_aqui,   match: 'voce (e colaborador|e funcionari[oa]|trabalha na empresa|trabalha n[ao] {empresa}|trabalha para {empresa})|(colaborador|funcionari[oa]) (d[ao] )?{empresa}|atualmente (empregad|colaborad)[ao]? (n[ao] |pel[ao] )?(empresa|{empresa}|conosco)', responder: "Não"}
+  - {id: concorrente,     match: 'concorr', responder: "Não"}
+  - {id: ja_trabalhou_ant, match: 'ja trabalhou n[ao] .{1,40} anteriormente', responder: "Não"}
+  - {id: veracidade,      match: 'declaro.*(verdad|veridic)|veracidade', responder: "Sim"}
+  - {id: maior_idade,     match: 'maior de 18|mais de 18 anos|maioridade', responder: "Sim"}
+  - {id: superior_farmacia, match: 'superior completo em farmacia|graduad[oa] em farmacia|formad[oa] em farmacia', responder: "Sim"}
+  - {id: pais,            match: 'reside no brasil|mora no brasil|resid.*pais', responder: "Brasil"}
+  - {id: estado,          match: 'em que estado|estado (onde|de residencia|em que)|qual (e )?o? ?seu estado(?! civil)|\buf\b de residencia', responder_perfil: estado}
+  - {id: cidade,          match: 'em que cidade|cidade (onde|de residencia|em que)|qual (e )?a? ?sua cidade(?! natal| de nasc| de origem)|municipio de residencia', responder_perfil: cidade}
+  - {id: linkedin,        match: 'linkedin', responder_perfil: linkedin}
+  - {id: ultimo_salario,  match: 'ultimo salario|salario atual|remuneracao atual|remuneracao.*atualmente|atualmente.*(sua )?(remuneracao|salario)', responder_perfil: ultimo_salario}
+  - {id: pretensao,       match: 'pretensao salarial|expectativa salarial|pretensao de salario|qual sua pretensao', tipo: pretensao}
+  - {id: formacao_saude,  match: 'formacao.*(saude)', responder: "Sim"}
+  - {id: cursando_super,  match: 'cursando (ensino )?superior|estudante de ensino superior|cursa (ensino )?superior|graduacao em andamento', responder: "Sim"}
+  - {id: sabados,         match: 'sabado', responder: "Sim"}
+  - {id: reunioes_pres,   match: 'reunioes presenciais', responder: "Sim"}
+  - {id: remoto_ok,       match: 'trabalhar (de forma )?remot|disponibilidade.*(remot|home office)', responder: "Sim"}
+  - {id: excel,           match: 'nivel.*excel|excel.*nivel|experiencia com excel', responder: "Intermediário"}
+  - {id: ingles,          match: 'nivel.*ingles|ingles.*nivel', responder: "Intermediário"}
+  - {id: faculdade_horario, match: 'horario da (sua )?faculdade', responder: "Faculdade EAD (ensino a distância), sem horário fixo de aula."}
+  - {id: mudanca,         match: 'disponibilidade (para|de) (mudanca|mudar|se mudar|realocacao)|aceita (mudar|se mudar)|mudar de cidade|mudanca de (cidade|estado)|realocacao', responder: "Sim"}
+  - {id: crf_ativo,       match: '\bcrf\b.*(ativo|regular)|(ativo|regular).*\bcrf\b|registro (ativo|regular) no (crf|conselho)', responder: "Sim"}
+  - {id: consorcio_exp,   match: 'experiencia.*consorcio', responder: "Não"}

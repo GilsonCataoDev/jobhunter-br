@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+
+# Dados pessoais: NUNCA versionar
+jobhunter/answers.yml
+jobhunter/data/*
+!jobhunter/data/.gitkeep
+auto_apply/
+*.db
+.env

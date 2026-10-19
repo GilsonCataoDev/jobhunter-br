@@ -1,0 +1,3 @@
+requests>=2.31.0
+pyyaml>=6.0.1
+# Fase 3 (envio), instale à parte: pip install playwright && playwright install chromium
