@@ -136,5 +136,19 @@ class TestSeguranca(unittest.TestCase):
         self.assertEqual(r("Qual a sua cidade natal?").kind, "pending")
 
 
+class TestHorarioRemoto(unittest.TestCase):
+    P = "Você tem disponibilidade para trabalhar das 13:40 às 20:00?"
+
+    def test_remoto_aceita_qualquer_horario(self):
+        r = answers.resolve(Q(self.P, ["Sim", "Não"]), "efetivo", CFG, None, "Acme", remoto=True)
+        self.assertEqual((r.kind, r.value), ("answer", "Sim"))
+
+    def test_presencial_continua_pendente(self):
+        self.assertEqual(answers.resolve(Q(self.P, ["Sim", "Não"]), "efetivo", CFG, None, "Acme").kind, "pending")
+
+    def test_texto_livre_sobre_horario_continua_pendente(self):
+        self.assertEqual(answers.resolve(Q(self.P, []), "efetivo", CFG, None, "Acme", remoto=True).kind, "pending")
+
+
 if __name__ == "__main__":
     unittest.main()

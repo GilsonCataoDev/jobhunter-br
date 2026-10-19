@@ -121,7 +121,7 @@ def _sim_nao(options):
     return bool(options) and {norm(o) for o in options} <= {"sim", "nao"}
 
 
-def resolve(q, job_kind="efetivo", cfg=None, learned=None, company=""):
+def resolve(q, job_kind="efetivo", cfg=None, learned=None, company="", remoto=False):
     """learned: função opcional qnorm -> resposta aprendida (respostas que o usuário já deu antes)."""
     cfg = cfg or load()
     n = norm(q.text)
@@ -129,6 +129,8 @@ def resolve(q, job_kind="efetivo", cfg=None, learned=None, company=""):
     if any(p.search(n) for p in cfg["_sens"]):
         return Result("sensitive", None, "documento/dado pessoal sensível: o usuário preenche", None)
     if RE_HORA.search(n):
+        if remoto and _sim_nao(q.options):  # decisão do usuário: vaga remota aceita qualquer horário
+            return Result("answer", pick_option("Sim", q.options), "vaga remota: qualquer horário serve", "horario_remoto")
         return Result("pending", None, "pergunta sobre horário específico", None)
 
     # Sim/Não que embute um valor de salário: só responde "Sim" se o valor cobre a pretensão
@@ -164,8 +166,8 @@ def resolve(q, job_kind="efetivo", cfg=None, learned=None, company=""):
     return Result("pending", None, "sem resposta salva para esta pergunta", None)
 
 
-def resolve_all(questions, job_kind="efetivo", cfg=None, learned=None, company=""):
+def resolve_all(questions, job_kind="efetivo", cfg=None, learned=None, company="", remoto=False):
     """Resolve uma lista. Devolve (resultados, completo): completo só se TODAS foram 'answer'."""
     cfg = cfg or load()
-    res = [resolve(q, job_kind, cfg, learned, company) for q in questions]
+    res = [resolve(q, job_kind, cfg, learned, company, remoto) for q in questions]
     return res, all(r.kind == "answer" for r in res)

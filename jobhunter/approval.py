@@ -16,7 +16,8 @@ def prepare_questions(con, job, questions, cfg=None):
     Devolve (resultados, completo). `questions`: lista de answers.Question."""
     cfg = cfg or answers.load()
     kind = "farmaceutico" if "farmac" in answers.norm(job["title"]) else job["kind"]
-    res, completo = answers.resolve_all(questions, kind, cfg, lambda qn: db.learned(con, qn), job["company"])
+    res, completo = answers.resolve_all(questions, kind, cfg, lambda qn: db.learned(con, qn), job["company"],
+                                        remoto=job["workplace"] == "remote")
     for q, r in zip(questions, res):
         if r.kind == "answer":
             continue

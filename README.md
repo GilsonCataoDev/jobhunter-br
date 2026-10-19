@@ -189,7 +189,7 @@ Vagas que passam podem trazer **avisos** (horário fixo, cita presencial, tempor
 Para cada pergunta do formulário, na ordem:
 
 1. **Sensível** → *nunca responde.* Documentos, filiação, nascimento, endereço, raça/gênero/PCD, dados bancários. Vira pendência marcada como sensível para **você** preencher.
-2. **Pergunta sobre horário específico** → pendência.
+2. **Pergunta sobre horário específico** → pendência. Exceção: em vaga **remota**, uma pergunta Sim/Não sobre horário ("pode das 13h às 20h?") é respondida "Sim", porque a premissa é que qualquer horário serve em home office. Em vaga presencial, ou com resposta em texto livre, continua pendência.
 3. **Sim/Não com salário embutido** → só responde "Sim" se o valor cobre a sua pretensão.
 4. **Regras do `answers.yml`** (a primeira que casar vence), por exemplo "alguém indicou você?" → Não, "maior de 18 anos?" → Sim, pretensão salarial → número ou a faixa que contém o seu valor.
 5. **Respostas que você já deu** (aprendidas pelo `/r`) para a mesma pergunta.
