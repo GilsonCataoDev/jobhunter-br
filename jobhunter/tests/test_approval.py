@@ -37,6 +37,32 @@ class FakeAPI:
         return [p["text"] for m, p in self.sent if m == "sendMessage"]
 
 
+class TestConfirmarSensivel(unittest.TestCase):
+    P = "Você precisa de alguma adaptação para nosso processo? (PARA PESSOAS COM DEFICIÊNCIA)"
+
+    def test_vale_so_para_a_vaga_confirmada_e_o_bot_continua_recusando(self):
+        con = novo_banco(job("gupy:1"), job("gupy:2"))
+        for jid in ("gupy:1", "gupy:2"):
+            approval.prepare_questions(con, db.get_job(con, jid), [Q(self.P, SN)], CFG)
+        pend = {p["job_id"]: p["id"] for p in db.open_pending(con)}
+        # o /r do bot recusa dado sensível
+        self.assertIn("sensível", approval.on_answer(con, pend["gupy:1"], "Não"))
+        # a confirmação direta vale só para a vaga 1
+        self.assertEqual(approval.confirmar_sensivel(con, pend["gupy:1"], "Não"), "Não")
+        r1, ok1 = approval.prepare_questions(con, db.get_job(con, "gupy:1"), [Q(self.P, SN)], CFG)
+        r2, ok2 = approval.prepare_questions(con, db.get_job(con, "gupy:2"), [Q(self.P, SN)], CFG)
+        self.assertTrue(ok1)
+        self.assertEqual(r1[0].value, "Não")
+        self.assertFalse(ok2)
+        self.assertEqual(r2[0].kind, "sensitive")
+
+    def test_opcao_invalida_nao_grava(self):
+        con = novo_banco(job("gupy:1"))
+        approval.prepare_questions(con, db.get_job(con, "gupy:1"), [Q(self.P, SN)], CFG)
+        pid = db.open_pending(con)[0]["id"]
+        self.assertIsNone(approval.confirmar_sensivel(con, pid, "talvez"))
+
+
 class TestPendencias(unittest.TestCase):
     def test_prepare_cria_pendencias_e_marca_sensivel(self):
         con = novo_banco(job())

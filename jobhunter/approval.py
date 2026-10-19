@@ -18,12 +18,39 @@ def prepare_questions(con, job, questions, cfg=None):
     kind = "farmaceutico" if "farmac" in answers.norm(job["title"]) else job["kind"]
     res, completo = answers.resolve_all(questions, kind, cfg, lambda qn: db.learned(con, qn), job["company"],
                                         remoto=job["workplace"] == "remote")
-    for q, r in zip(questions, res):
+    for i, (q, r) in enumerate(zip(questions, res)):
+        if r.kind == "sensitive":  # você confirmou esta pergunta, NESTA vaga, direto ao assistente (ver confirmar_sensivel)
+            v = db.learned(con, _chave_vaga(job["id"], answers.norm(q.text)))
+            ok = answers.pick_option(v, q.options) if (v and q.options) else v
+            if ok:
+                res[i] = r = answers.Result("answer", ok, "confirmada por você nesta vaga", "confirmada")
         if r.kind == "answer":
             continue
         motivo = f"{SENSIVEL}: {r.reason}" if r.kind == "sensitive" else r.reason
         db.add_pending(con, job["id"], q.text, answers.norm(q.text), list(q.options), motivo)
-    return res, completo
+    return res, all(r.kind == "answer" for r in res)
+
+
+def _chave_vaga(job_id, qnorm):
+    return f"{job_id}|{qnorm}"
+
+
+def confirmar_sensivel(con, pending_id, resposta):
+    """Grava, SÓ PARA A VAGA DA PENDÊNCIA, a resposta que o usuário ditou ao assistente para uma pergunta sensível.
+    Nunca é reaproveitada em outra vaga nem passa pelo /r do bot (que recusa dado sensível). Devolve a resposta usada."""
+    row = con.execute("SELECT * FROM pending_questions WHERE id=?", (pending_id,)).fetchone()
+    if not row or row["status"] != "open":
+        return None
+    opcoes = json.loads(row["options"])
+    if opcoes:
+        resposta = answers.pick_option(resposta, opcoes)
+        if resposta is None:
+            return None
+    db.answer_pending(con, pending_id, resposta, learn=False)
+    con.execute("INSERT OR REPLACE INTO learned_answers (qnorm, answer, created) VALUES (?,?,?)",
+                (_chave_vaga(row["job_id"], row["qnorm"]), resposta, db.now()))
+    con.commit()
+    return resposta
 
 
 def offer_text(job):
