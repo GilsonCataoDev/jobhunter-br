@@ -249,5 +249,26 @@ class TestRevisao(unittest.TestCase):
             gupy._get(sessao, "u", {})   # 404 não é transitório: não insiste
 
 
+class TestDesejaveisPlural(unittest.TestCase):
+    def test_itens_depois_do_cabecalho_desejavel_nao_sao_exigencia(self):
+        from jobhunter import rules
+        from jobhunter.run import load_cfg
+        j = {"title": "Analista de Dados Júnior", "company": "Acme", "url": "u", "kind": "efetivo", "workplace": "remote",
+             "published": "", "deadline": "", "description":
+             "Requisitos: graduação em andamento. Requisitos Desejáveis - DBT: prática em modelos. Experiência com data "
+             "warehouses (Snowflake). Conhecimento de Python. Informações adicionais: benefícios."}
+        self.assertTrue(rules.evaluate(j, load_cfg()).ok)
+        j2 = dict(j, description="Requisitos: Experiência com data warehouses (Snowflake). Desejável: Python.")
+        self.assertFalse(rules.evaluate(j2, load_cfg()).ok)
+
+    def test_requisitos_desejaveis_nao_sao_exigencia(self):
+        from jobhunter import rules
+        from jobhunter.run import load_cfg
+        j = {"title": "Analista de Dados Júnior", "company": "Acme", "url": "u", "kind": "efetivo", "workplace": "remote",
+             "published": "", "deadline": "", "description":
+             "Requisitos: graduação em andamento. Requisitos Desejáveis - Experiência com data warehouses e dbt."}
+        self.assertTrue(rules.evaluate(j, load_cfg()).ok)
+
+
 if __name__ == "__main__":
     unittest.main()

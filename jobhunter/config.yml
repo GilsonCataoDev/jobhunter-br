@@ -16,19 +16,25 @@ gupy:
     - analista administrativo
     - atendimento
     - assistente
+    - estágio dados
+    - analista de dados júnior
+    - inteligência artificial
+    - estágio ia
+    - automação
+    - python júnior
 
 # Fontes extras (só leitura; o robô NÃO se candidata nelas: você recebe o link). Só entram vagas remotas.
 infojobs:
   ativo: true
   max_paginas_por_termo: 1          # 20 vagas por página, mais recentes primeiro (filtro "home office" do site)
-  termos: [suporte, analista de suporte, help desk, service desk, qa, estágio ti, assistente administrativo, atendimento]
+  termos: [suporte, analista de suporte, help desk, service desk, qa, estágio ti, assistente administrativo, atendimento, analista de dados júnior, estágio dados, inteligência artificial]
 vagaja:
   ativo: true
   max_paginas: 60                   # o site é pequeno: filtra o sitemap pelo título antes de abrir as vagas
 
 # Prioridade (menor = melhor). A primeira palavra encontrada no TÍTULO define a faixa.
 faixas:
-  1: [suporte, "service desk", "help desk", "qa", "teste", "estágio", "estagiário", "desenvolvedor", "front", "tecnologia", "ti"]
+  1: [suporte, "service desk", "help desk", "qa", "teste", "estágio", "estagiário", "desenvolvedor", "front", "tecnologia", "ti", "dados", "ia", "inteligência artificial", "automação", "machine learning", "python", "bi"]
   2: [administrativ, "assistente de atendimento", "auxiliar", "analista de implantação", "assistente implantação", "cadastro", "back office"]
   3: [atendimento]
 
@@ -54,6 +60,9 @@ titulo_proibido:
   - pcd
   - "vaga exclusiva"
   - bilíngue
+  - arquitetura
+  - logística
+  - logistica
   - bilingue
 
 salario_minimo_efetivo: 2000        # só se a vaga informar o salário

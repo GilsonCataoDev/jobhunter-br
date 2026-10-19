@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 Decision = namedtuple("Decision", "ok reason warnings tier")
 
 DESEJAVEL = re.compile(
-    r"desej[aá]vel|diferencia(?:l|is)|bacana|ser[ií]a interessante|se tiver|opcional|ser[aá] um plus|n[aã]o [eé] obrigat|"
+    r"desej[aá]ve(?:l|is)|diferencia(?:l|is)|bacana|ser[ií]a interessante|se tiver|opcional|ser[aá] um plus|n[aã]o [eé] obrigat|"
     r"n[aã]o obrigat|voc[eê] ir[aá] se diferenciar|ou desej", re.I)
 SEM_EXP = re.compile(r"sem experi[eê]ncia|n[aã]o (?:[eé] )?(?:necess[aá]ri|exig)|n[aã]o precisa de experi", re.I)
 
@@ -45,11 +45,31 @@ def _linhas(texto):
     return [p.strip() for p in partes if p.strip()]
 
 
+# Cabeçalho de seção desejável ("Requisitos Desejáveis -", "Diferenciais:"): tudo o que vem depois, até o próximo
+# bloco (benefícios, informações adicionais…), é desejável mesmo que a frase em si não repita a palavra.
+HEADER_DESEJ = re.compile(r"(?:requisitos|qualifica[cç][õo]es|conhecimentos|itens)\s+(?:desej[aá]ve(?:l|is)|diferenciais)"
+                          r"|diferenciais\s*[:\-–]|desej[aá]ve(?:l|is)\s*[:\-–]", re.I)
+FIM_SECAO = re.compile(r"informa[cç][õo]es adicionais|benef[ií]cios|sobre a empresa|etapas do processo|remunera[cç][aã]o", re.I)
+
+
+def _exigencias(texto):
+    """Linhas que podem ser EXIGÊNCIA: descarta as de itens desejáveis e as que seguem um cabeçalho de desejáveis."""
+    em_desejavel = False
+    for ln in _linhas(texto):
+        if FIM_SECAO.search(ln):
+            em_desejavel = False
+        if HEADER_DESEJ.search(ln):
+            em_desejavel = True
+        if em_desejavel or DESEJAVEL.search(ln) or SEM_EXP.search(ln):
+            continue
+        yield ln
+
+
 def obrigatorio(texto, padrao):
     """Algum trecho casa o padrão e NÃO é item desejável/diferencial?"""
-    for ln in _linhas(texto):
+    for ln in _exigencias(texto):
         m = padrao.search(ln)
-        if m and not DESEJAVEL.search(ln) and not SEM_EXP.search(ln) and not _fala_da_empresa(ln[:m.start()]):
+        if m and not _fala_da_empresa(ln[:m.start()]):
             return ln[:90]
     return ""
 
@@ -143,9 +163,7 @@ def evaluate(job, cfg, agora=None):
 
     # experiência
     anos = 0
-    for linha in _linhas(texto):
-        if DESEJAVEL.search(linha) or SEM_EXP.search(linha):
-            continue
+    for linha in _exigencias(texto):
         for m in RE_ANOS.finditer(linha):
             # "empresa com mais de 20 anos de experiência" fala da EMPRESA, não do candidato
             if _fala_da_empresa(linha[:m.start()]):
