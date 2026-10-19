@@ -32,6 +32,13 @@ class JsonLd(unittest.TestCase):
         self.assertEqual((j["workplace"], j["kind"], j["title"]), ("remote", "pj", "Analista Contábil"))
         self.assertEqual(j["deadline"], "2026-11-02T03:00:00")
 
+    def test_pj_vence_rotulo_de_estagio(self):
+        jp = dict(INFOJOBS, employmentType="", title="Assistente Administrativo",
+                  description="Área Profissional: Estagiário em Administração<br>Modelo: PJ, home office, 20h/semana")
+        self.assertEqual(jsonld.normalize(jp, "infojobs", "2", "u")["kind"], "pj")
+        jp2 = dict(jp, title="Estágio Administrativo", description="Bolsa-auxílio, home office")
+        self.assertEqual(jsonld.normalize(jp2, "infojobs", "3", "u")["kind"], "estagio")
+
     def test_sem_jobposting(self):
         self.assertIsNone(jsonld.job_posting('<script type="application/ld+json">{"@type":"Organization"}</script>'))
         self.assertIsNone(jsonld.job_posting('<script type="application/ld+json">{quebrado</script>'))

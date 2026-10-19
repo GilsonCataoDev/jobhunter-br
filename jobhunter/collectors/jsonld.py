@@ -33,12 +33,14 @@ def kind(jp, texto):
     """efetivo | estagio | pj | temporario | aprendiz, pelo employmentType e pelo texto."""
     tipo = str(jp.get("employmentType") or "").lower()
     t = texto.lower()
+    # PJ/autônomo vence qualquer rótulo de estágio: "Área: Estagiário" numa vaga "Modelo: PJ" é PJ
+    if "contractor" in tipo or re.search(r"\(pj\)|regime[^.\n]{0,30}\bpj\b|modelo:?\s*pj\b|aut[oô]nomo|"
+                                         r"presta[cç][aã]o de servi[cç]os|prestador de servi", t):
+        return "pj"
     if "intern" in tipo or re.search(r"\best[aá]gi", t[:200]):
         return "estagio"
     if re.search(r"jovem aprendiz|\baprendiz\b", t[:200]):
         return "aprendiz"
-    if "contractor" in tipo or re.search(r"\(pj\)|regime[^.\n]{0,30}\bpj\b|presta[cç][aã]o de servi[cç]os|prestador de servi", t):
-        return "pj"
     if "temporary" in tipo or re.search(r"\btempor[aá]ri", t[:300]):
         return "temporario"
     return "efetivo"
